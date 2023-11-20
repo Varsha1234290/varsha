@@ -1,0 +1,105 @@
+ASSIGNMENT NO 3
+
+#Importing required libraries 
+import matplotlib.pyplot as plt 
+import pandas as pd
+import seaborn as sns 
+import numpy as np
+ 
+#Reading the input dataset
+trainData = pd.read_csv("temperatures.csv")
+
+#Print first 10 records
+print(trainData.head(n=10))
+
+#Printing datatypes and columns in the dataset 
+#datatypes columwise
+print("Below are the datatypes of columns:") 
+print(trainData.dtypes)
+print()
+
+#column names
+print("Below are the columns in the dataset:") 
+print(trainData.columns)
+print()
+
+#describe min, max temp, count, std dev values 
+print("Descritive information about data set:") 
+print(trainData.describe())
+
+#To check if dataset has null values or not
+print(trainData.isnull().sum())
+
+#To find top 10 temperature
+#As per 'Annual col' find 'top 10' temp data 
+top_10_data = trainData.nlargest(10, "ANNUAL")
+ 
+#Mentioned figure size 
+plt.figure(figsize=(14,12))
+plt.title("Top 10 temperature records")
+#In barplot x & y axis year & temp resp
+sns.barplot(x=top_10_data.YEAR, y=top_10_data.ANNUAL)
+
+#It is found that highest record of temperature is in 2016 roughly 
+#about 32 degree Celsius
+#Analyse 2016 data
+data_2016 = trainData[trainData["YEAR"]==2016]
+#x axis temp data in array format
+xticks = np.array(data_2016[["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"]].values)
+#y axis months labels
+yticks = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"]
+
+#To plot the graph 
+#Mentioned figsize 
+plt.figure(figsize=(10,8))
+#barh: xticks & yticks get and set the current tick locations and labels of the x & y-axis.
+plt.barh(yticks,xticks[0])
+plt.title("Month wise temperature data of 2016") 
+plt.xlabel("Temperature in degree celsius") 
+plt.ylabel("Month")
+plt.show()
+
+#From the above graph it is clear that May month recorded highest temperature around 35 degree celsius
+#Genearate Regresion Model of Training & Testing Data
+from sklearn import linear_model, metrics 
+
+#train data according columns 
+print(trainData.columns)
+#x axis = year
+X=trainData[["YEAR"]]
+# y axis= month wise temp
+Y=trainData[["JAN"]]
+#import training & testing features
+from sklearn.model_selection import train_test_split
+#split data in training & testing part
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=1) print(len(X_train)) #lenth of x-train data
+print(len(X_test)) #length of y-testing data
+print(trainData.shape) #Show total row & column (117,18) 
+
+#Used Linear Regression Model Features to show data
+reg = linear_model.LinearRegression() 
+print(X_train)
+#fit decision line in Regression Model 
+model = reg.fit(X_train, Y_train) 
+#Predict test data
+Y_pred = model.predict(X_test)
+#Year wise predtion data
+print('predicted response:', Y_pred, sep='\n') 
+#training regression model Scatter black color plots 
+plt.scatter(X_train, Y_train, color='black')
+#Blue line indicate predicted training data
+plt.plot(X_train, reg.predict(X_train), color='blue', linewidth=3) 
+plt.title("Temperature vs Year")
+plt.xlabel("Year") 
+plt.ylabel("Temperature") 
+plt.show()
+
+
+#testing regression model Scatter red color plots
+plt.scatter(X_test, Y_test, color='red')
+#Acc year machine predict temp
+plt.plot(X_test, reg.predict(X_test), color='black', linewidth=3) 
+plt.title("Temperature vs Year")
+plt.xlabel("Year") 
+plt.ylabel("Temperature") 
+plt.show()
